@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Diagnostics.PerformanceData;
 using System.Media;
+using System.Numerics;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -21,59 +22,73 @@ namespace Lopalka
     /// </summary>
     public partial class MainWindow : Window
     {
+        private int clickCount = 0;
+        private readonly Random rnd;
+        private readonly MediaPlayer mediaPlayer;
+
+        private const string BaseMediaPath = "C:\\Users\\Snipe\\Source\\Repos\\LopalkaWPF\\Lopalka\\Sounds\\";
+
+        private readonly Dictionary<int, string> SoundPathes;
+
         public MainWindow()
         {
             InitializeComponent();
+            rnd = new Random();
+            mediaPlayer = new MediaPlayer();
 
-
+            SoundPathes = new Dictionary<int, string>()
+            {
+                { 1, "first-blood-101soundboards.mp3" },
+                { 2, "double-kill-101soundboards.mp3" },
+                { 3, "triple-kill-101soundboards.mp3" },
+                { 4, "ultra-kill-101soundboards.mp3" },
+                { 5, "rampage-101soundboards.mp3" },
+                { 6, "sunstrike-101soundboards.mp3" }
+            };
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
 
 
-            this.Start.IsEnabled = false;
-            this.Start.Visibility = Visibility.Collapsed;
+            Start.IsEnabled = false;
+            Start.Visibility = Visibility.Collapsed;
 
 
-            maingrid.Background = new SolidColorBrush(Color.FromRgb(51,102,255));
+            Maingrid.Background = new SolidColorBrush(Color.FromRgb(51, 102, 255));
 
-            schet.Visibility = Visibility.Visible;
-            Puz.Visibility = Visibility.Visible;
+            Score.Visibility = Visibility.Visible;
+            Click.Visibility = Visibility.Visible;
 
-            Random random = new Random();
-            int x_pos = random.Next(0, 1100);
-            int y_pos = random.Next(0, 700);
-
-
-            Puz.Margin = new Thickness(x_pos, y_pos, 0, 0);
-
-
-
-
+            CreateBubble();
 
         }
-        private int clickcount = 0;
-        private void puz_click(object sender, RoutedEventArgs e)
-        {
 
-            var mediaPlayer = new MediaPlayer();
-            mediaPlayer.Open(new Uri("C:\\Users\\zikku\\source\\repos\\Lopalka\\untitled.wav")); // Укажите путь к вашему звуковому файлу
-            mediaPlayer.Stop();
+        private void CreateBubble()
+        {
+            int xPos = rnd.Next(0, 1100);
+            int yPos = rnd.Next(0, 700);
+
+
+            Click.Margin = new Thickness(xPos, yPos, 0, 0);
+        }
+
+        private void BubbleClick(object sender, RoutedEventArgs e)
+        {
+            clickCount++;
+            Score.Text = $"{clickCount}";
+
+            var soundNum = clickCount >= 6 ? 6 : clickCount;
+
+            mediaPlayer.Open(new Uri($"{BaseMediaPath}{SoundPathes[soundNum]}"));
             mediaPlayer.Play();
-            clickcount++;
-            schet.Text = $"{clickcount}";
 
-
-            Random random = new Random();
-            int x_pos = random.Next(0, 1100);
-            int y_pos = random.Next(0, 700);
-            Puz.Margin = new Thickness(x_pos, y_pos, 0, 0);
+            CreateBubble();
         }
 
-        private void Button_Click_1(object sender, RoutedEventArgs e)
+        private void ExitClick(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            Close();
         }
 
     }
